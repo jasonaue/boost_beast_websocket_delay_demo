@@ -1,3 +1,13 @@
+COMMANDS TO RUN
+
+make
+./main 1>out.txt 2>err.txt
+#wait 5 minutes
+grep "issue_occured=1" out.txt
+
+
+MORE INFO
+
 I am experiencing occasionally long delays in calling ws.read(buffer), even when there is a huge amount of data on the socket waiting to be read.
 
 Normal behavior: ws.read(buffer) takes:
