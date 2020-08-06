@@ -1,0 +1,18 @@
+I am experiencing occasionally long delays in calling ws.read(buffer), even when there is a huge amount of data on the socket waiting to be read.
+
+Normal behavior: ws.read(buffer) takes:
+Approx 5us when no data is read from the socket (i.e., it is buffered at a higher level, in TLS or inflate)
+Approx 80us when data is waiting and read from the network socket
+Obviously, up to infinity when no data is buffered in the network socket
+
+Abnormal behavior: ws.read(buffer) takes up to 10 milliseconds, even though there is plenty of data in the socket. The socket may or may not be read from.
+
+These delays often occur in batches. Everything will be normal, and then suddenly all reads are slow. While this is happening, the socket.available() will become very high.
+Eventually, the socket.available() becomes exhausted, which seems to be when the issues ends.
+
+I have trouble reproducing the batch situation, as it seems to rely on huge load. However, it is fairly simple to reproduce a situation where occasional messages take much
+longer to read than I would expect. That is what this code does.
+
+I have found that the issue occurs almost exclusively when message sizes are large. This leads me to suspect is is related to messages spanning multiple packets.
+
+To recreate the issue: run this code. Grep for the line "issue_occured=1" in stdout. That is a demonstration of what I believe is unexpected behavior, and probably a bug.
